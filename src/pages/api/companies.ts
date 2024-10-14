@@ -23,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const companies = await collection.find({}).toArray();
     res.status(200).json(companies);
   } catch (error) {
+    console.error('Error fetching data:', error);  // Logs the error for debugging
     res.status(500).json({ error: 'Failed to fetch data' });
   }
 }
