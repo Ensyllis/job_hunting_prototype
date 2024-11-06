@@ -8,6 +8,7 @@ interface Company {
   AUM?: string;
   Link?: string;
   Status?: string;
+  WebsiteText?: string;  // Added WebsiteText field
   error_message?: string;
   People?: {
     [email: string]: {
@@ -26,6 +27,7 @@ const JobHuntPipeline: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [expandedText, setExpandedText] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch companies from the backend
@@ -41,6 +43,12 @@ const JobHuntPipeline: React.FC = () => {
   const filteredCompanies = searchQuery
     ? companies.filter(company => company.FirmName.toLowerCase().includes(searchQuery.toLowerCase()))
     : companies;
+
+  // Function to truncate text
+  const truncateText = (text: string, maxLength: number = 200) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
+  };
 
   return (
     <div className={`${styles.container} ${darkMode ? styles.dark : styles.light}`}>
@@ -74,6 +82,7 @@ const JobHuntPipeline: React.FC = () => {
               <th>AUM</th>
               <th>Link</th>
               <th>Status</th>
+              <th>Website Content</th>
               <th>People</th>
               <th>Email Draft</th>
               <th>Email Action</th>
@@ -92,6 +101,35 @@ const JobHuntPipeline: React.FC = () => {
                   ) : 'N/A'}
                 </td>
                 <td>{company.Status || 'N/A'}</td>
+                <td className={styles.websiteTextCell}>
+                  {company.WebsiteText ? (
+                    <div className={styles.websiteTextContainer}>
+                      <div className={styles.websiteTextContent}>
+                        {expandedText === company._id ? (
+                          <>
+                            <p>{company.WebsiteText}</p>
+                            <button 
+                              onClick={() => setExpandedText(null)}
+                              className={styles.toggleButton}
+                            >
+                              Show Less
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <p>{truncateText(company.WebsiteText)}</p>
+                            <button 
+                              onClick={() => setExpandedText(company._id)}
+                              className={styles.toggleButton}
+                            >
+                              Show More
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ) : 'No content available'}
+                </td>
                 <td>
                   {company.People ? (
                     <ul>
